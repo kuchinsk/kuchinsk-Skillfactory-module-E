@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:13.0-alpine
+    container_name: postgres_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_USER: "hello_django"
+      POSTGRES_PASSWORD: "hello_django"
+      POSTGRES_DB: "hello_django_dev"
+    ports:
+      - 5432:5432
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}" ]
+      interval: 2s
+      timeout: 1s
+      retries: 5
+      start_period: 1s
+      
+  web:
+    build: ./app
+    container_name: django
+    command: gunicorn hello_django.wsgi:application --bind 0.0.0.0:8000
+    environment:
+      - DJANGO_SUPERUSER_USERNAME=admin
+      - DJANGO_SUPERUSER_PASSWORD=admin
+      - DJANGO_SUPERUSER_EMAIL=admin@example.com
+    volumes:
+      - ./app/:/usr/src/app/
+      - ./app/staticfile/:/usr/src/app/staticfile/
+      - ./app/mediafile/:/usr/src/app/mediafile/
+    expose:
+      - 8000
+    env_file:
+      - ./.env.dev
+    depends_on:
+      - db
+  nginx:
+    build: ./nginx
+    container_name: nginx
+    volumes:
+      - ./app/:/usr/src/app/
+      - ./app/staticfile/:/usr/src/app/staticfile/
+      - ./app/mediafile/:/usr/src/app/mediafile/
+    ports:
+      - 1337:80
+    depends_on:
+      - web
+
+volumes:
+  postgres_data:
