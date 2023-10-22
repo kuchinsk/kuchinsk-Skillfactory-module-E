@@ -18,9 +18,9 @@ COPY ./requirements.txt .
 RUN pip install -r requirements.txt
 
 # copy entrypoint.sh
-COPY ./entrypoint.sh .
-RUN sed -i 's/\r$//g' /usr/src/app/entrypoint.sh
-RUN chmod +x /usr/src/app/entrypoint.sh
+# COPY ./entrypoint.sh .
+# RUN sed -i 's/\r$//g' /usr/src/app/entrypoint.sh
+# RUN chmod +x /usr/src/app/entrypoint.sh
 
 # create the appropriate directories
 RUN mkdir /usr/src/app/staticfiles
@@ -28,4 +28,7 @@ RUN mkdir /usr/src/app/mediafiles
 
 # copy project
 COPY . .
-ENTRYPOINT ["/usr/src/app/entrypoint.sh"]
+
+# CMD ["./entrypoint.sh"]
+# ENTRYPOINT ["/usr/src/app/entrypoint.sh"]
+# ENTRYPOINT ["./entrypoint.sh"]

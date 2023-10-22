@@ -22,15 +22,15 @@ services:
   web:
     build: ./app
     container_name: django
-    command: gunicorn hello_django.wsgi:application --bind 0.0.0.0:8000
+    command: sh -c "python manage.py migrate && python manage.py createsuperuser --noinput && gunicorn hello_django.wsgi:application --bind 0.0.0.0:8000"
     environment:
       - DJANGO_SUPERUSER_USERNAME=admin
       - DJANGO_SUPERUSER_PASSWORD=admin
       - DJANGO_SUPERUSER_EMAIL=admin@example.com
     volumes:
       - ./app/:/usr/src/app/
-      - ./app/staticfile/:/usr/src/app/staticfile/
-      - ./app/mediafile/:/usr/src/app/mediafile/
+      - ./app/staticfiles/:/usr/src/app/staticfiles/
+      - ./app/mediafiles/:/usr/src/app/mediafiles/
     expose:
       - 8000
     env_file:
@@ -42,8 +42,8 @@ services:
     container_name: nginx
     volumes:
       - ./app/:/usr/src/app/
-      - ./app/staticfile/:/usr/src/app/staticfile/
-      - ./app/mediafile/:/usr/src/app/mediafile/
+      - ./app/staticfiles/:/usr/src/app/staticfiles/
+      - ./app/mediafiles/:/usr/src/app/mediafiles/
     ports:
       - 1337:80
     depends_on:
@@ -51,3 +51,5 @@ services:
 
 volumes:
   postgres_data:
+  static_volume:
+  media_volume:
