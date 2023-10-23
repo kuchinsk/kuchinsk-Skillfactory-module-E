@@ -1,8 +1,8 @@
 # pull official base image
-FROM python:3.9.6-alpine
+FROM python:3.10-alpine
 
 # set work directory
-WORKDIR /usr/src/app
+WORKDIR /usr/src
 
 # set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -17,18 +17,18 @@ RUN pip install --upgrade pip
 COPY ./requirements.txt .
 RUN pip install -r requirements.txt
 
-# copy entrypoint.sh
-# COPY ./entrypoint.sh .
-# RUN sed -i 's/\r$//g' /usr/src/app/entrypoint.sh
-# RUN chmod +x /usr/src/app/entrypoint.sh
-
-# create the appropriate directories
+RUN mkdir /usr/src/app
 RUN mkdir /usr/src/app/staticfiles
 RUN mkdir /usr/src/app/mediafiles
 
-# copy project
-COPY . .
+# copy entrypoint.sh
+COPY ./entrypoint.sh ./app
+RUN sed -i 's/\r$//g' /usr/src/app/entrypoint.sh
+RUN chmod +xrw /usr/src/app/entrypoint.sh
 
-# CMD ["./entrypoint.sh"]
-# ENTRYPOINT ["/usr/src/app/entrypoint.sh"]
-# ENTRYPOINT ["./entrypoint.sh"]
+# CMD ["/usr/src/app/entrypoint.sh"]
+# copy project
+ENTRYPOINT ["/usr/src/app/entrypoint.sh"]
+
+COPY . .
+# CMD ["/usr/src/app/entrypoint.sh"]
